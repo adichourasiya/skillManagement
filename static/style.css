@@ -1,0 +1,74 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    background-color: #f8f9fa; /* Light background for better readability */
+}
+
+h1, h2 {
+    color: #333; /* Darker text for headings */
+}
+
+table {
+    width: 70%; /* Wider table for better layout */
+    border-collapse: collapse;
+    margin: 20px 0;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow for the table */
+}
+
+table, th, td {
+    border: 1px solid #ced4da; /* Light border color */
+    padding: 12px; /* Increased padding for better spacing */
+    text-align: left;
+}
+
+th {
+    background-color: #e9ecef; /* Light grey background for header */
+    font-weight: bold; /* Bold header text */
+}
+
+td {
+    background-color: #ffffff; /* White background for table cells */
+}
+
+.flash {
+    margin: 10px 0;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.success {
+    background-color: #d4edda; /* Light green background for success messages */
+    color: #155724; /* Darker green text for readability */
+}
+
+.error {
+    background-color: #f8d7da; /* Light red background for error messages */
+    color: #721c24; /* Darker red text for readability */
+}
+
+form {
+    margin-bottom: 30px; /* Space between forms */
+    padding: 15px;
+    border: 1px solid #ced4da; /* Light border around the form */
+    border-radius: 5px; /* Rounded corners */
+    background-color: #ffffff; /* White background for the form */
+}
+
+input[type="text"], button {
+    width: calc(100% - 20px); /* Full width minus padding */
+    padding: 10px;
+    margin-top: 5px; /* Space above inputs */
+    border: 1px solid #ced4da; /* Light border color */
+    border-radius: 5px; /* Rounded corners */
+}
+
+button {
+    background-color: #007bff; /* Bootstrap primary color */
+    color: white; /* White text on button */
+    border: none; /* Remove default button border */
+    cursor: pointer; /* Pointer cursor on hover */
+}
+
+button:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+}
