@@ -1,82 +1,112 @@
-from flask import Flask, render_template, request, redirect, flash
-import csv
-import os
+from flask import Flask, render_template, request, redirect, url_for
+import sqlite3
 
 app = Flask(__name__)
-app.secret_key = 'your_secret_key'  # Replace with a secure secret key
-filename = "employee_skills.csv"
 
-# Function to load or create CSV file
-def load_or_create_csv():
-    if not os.path.isfile(filename):
-        with open(filename, mode='w', newline='') as file:
-            writer = csv.writer(file)
-            writer.writerow(["Employee Name", "Skill", "Skill Level"])  # Headers
-        print(f"Created new CSV file: {filename}")
+# Initialize the database (SQLite) if it doesn't exist
+def init_db():
+    conn = sqlite3.connect('data.db')
+    c = conn.cursor()
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS students (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL
+        )
+    ''')
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS skills (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            student_id INTEGER NOT NULL,
+            name TEXT NOT NULL,
+            score INTEGER DEFAULT 0,
+            url TEXT NOT NULL,
+            FOREIGN KEY (student_id) REFERENCES students(id)
+        )
+    ''')
+    conn.commit()
+    conn.close()
 
-# Function to add a new employee skill record
-def add_employee_skill(employee_name, skill, skill_level):
-    with open(filename, mode='a', newline='') as file:
-        writer = csv.writer(file)
-        writer.writerow([employee_name, skill, skill_level])
-
-# Function to update an employee's skill level
-def update_employee_skill(employee_name, skill, skill_level):
-    skills = get_all_skills()
-    with open(filename, mode='w', newline='') as file:
-        writer = csv.writer(file)
-        writer.writerow(["Employee Name", "Skill", "Skill Level"])  # Write headers
-        for existing_employee, existing_skill, existing_level in skills:
-            if existing_employee == employee_name and existing_skill == skill:
-                writer.writerow([employee_name, skill, skill_level])  # Update skill level
-            else:
-                writer.writerow([existing_employee, existing_skill, existing_level])  # Retain existing record
-
-# Function to get all employee skills
-def get_all_skills():
-    if os.path.isfile(filename):
-        with open(filename, mode='r') as file:
-            reader = csv.reader(file)
-            next(reader)  # Skip header
-            return list(reader)
-    return []
-
-# Route to display the form and list of skills
+# Home route (admin view by default)
 @app.route('/')
-def index():
-    skills = get_all_skills()
-    return render_template('index.html', skills=skills)
+def admin_dashboard():
+    conn = sqlite3.connect('data.db')
+    c = conn.cursor()
 
-# Route to handle form submission for adding skills
+    # Fetch all students for the admin dashboard
+    c.execute('SELECT * FROM students')
+    students = c.fetchall()
+
+    conn.close()
+    return render_template('admin_dashboard.html', students=students)
+
+# Route for adding a student
+@app.route('/add_student', methods=['POST'])
+def add_student():
+    name = request.form['student_name']
+    
+    conn = sqlite3.connect('data.db')
+    c = conn.cursor()
+    c.execute('INSERT INTO students (name) VALUES (?)', (name,))
+    conn.commit()
+    conn.close()
+    
+    return redirect(url_for('admin_dashboard'))
+
+# Route for removing a student
+@app.route('/remove_student', methods=['POST'])
+def remove_student():
+    student_id = request.form['student_id']
+    
+    conn = sqlite3.connect('data.db')
+    c = conn.cursor()
+    c.execute('DELETE FROM students WHERE id=?', (student_id,))
+    conn.commit()
+    conn.close()
+    
+    return redirect(url_for('admin_dashboard'))
+
+# Route for adding a skill to a student
 @app.route('/add_skill', methods=['POST'])
 def add_skill():
-    employee_name = request.form['employee_name']
-    skill = request.form['skill']
-    skill_level = request.form['skill_level']
+    student_id = request.form['student_id']
+    skill_name = request.form['skill_name']
+    skill_url = request.form['skill_url']
+    
+    conn = sqlite3.connect('data.db')
+    c = conn.cursor()
+    c.execute('INSERT INTO skills (student_id, name, url) VALUES (?, ?, ?)', (student_id, skill_name, skill_url))
+    conn.commit()
+    conn.close()
+    
+    return redirect(url_for('admin_dashboard'))
 
-    if employee_name and skill and skill_level:
-        add_employee_skill(employee_name, skill, skill_level)
-        flash('Skill added successfully!', 'success')
-        return redirect('/')
-    else:
-        flash('All fields are required.', 'error')
-        return redirect('/')
+# Route for removing a skill from a student
+@app.route('/remove_skill', methods=['POST'])
+def remove_skill():
+    student_id = request.form['student_id']
+    skill_name = request.form['skill_name']
+    
+    conn = sqlite3.connect('data.db')
+    c = conn.cursor()
+    c.execute('DELETE FROM skills WHERE student_id=? AND name=?', (student_id, skill_name))
+    conn.commit()
+    conn.close()
+    
+    return redirect(url_for('admin_dashboard'))
 
-# Route to handle form submission for updating skill levels
-@app.route('/update_skill', methods=['POST'])
-def update_skill():
-    employee_name = request.form['employee_name']
-    skill = request.form['skill']
-    skill_level = request.form['skill_level']
+# Route for the student dashboard (students see their skills)
+@app.route('/student/<int:student_id>')
+def student_dashboard(student_id):
+    conn = sqlite3.connect('data.db')
+    c = conn.cursor()
 
-    if employee_name and skill and skill_level:
-        update_employee_skill(employee_name, skill, skill_level)
-        flash('Skill level updated successfully!', 'success')
-        return redirect('/')
-    else:
-        flash('All fields are required.', 'error')
-        return redirect('/')
+    # Fetch student's skills
+    c.execute('SELECT name, score, url FROM skills WHERE student_id=?', (student_id,))
+    skills = c.fetchall()
 
-if __name__ == "__main__":
-    load_or_create_csv()
+    conn.close()
+    return render_template('student_dashboard.html', skills=skills)
+
+if __name__ == '__main__':
+    init_db()  # Initialize the database when starting the app
     app.run(debug=True)

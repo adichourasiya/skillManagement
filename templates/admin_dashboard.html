@@ -4,52 +4,48 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        table { width: 50%; border-collapse: collapse; margin: 20px 0; }
-        table, th, td { border: 1px solid black; padding: 8px; text-align: left; }
-        th { background-color: #f2f2f2; }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
 <body>
     <h1>Admin Dashboard</h1>
-    <a href="/logout">Logout</a>
+    
+    <!-- Section for Adding/Removing Students -->
+    <h2>Manage Students</h2>
+    <form action="/add_student" method="POST">
+        <label for="student_name">Student Name:</label>
+        <input type="text" id="student_name" name="student_name" required>
+        <button type="submit">Add Student</button>
+    </form>
+    
+    <form action="/remove_student" method="POST">
+        <label for="student_id">Student ID:</label>
+        <input type="text" id="student_id" name="student_id" required>
+        <button type="submit">Remove Student</button>
+    </form>
 
-    <h2>Employee Skills</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Employee Name</th>
-                <th>Skill</th>
-                <th>Skill Level</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for skill in skills %}
-            <tr>
-                <td>{{ skill[0] }}</td>
-                <td>{{ skill[1] }}</td>
-                <td>{{ skill[2] }}</td>
-                <td>
-                    <form action="/edit_skill" method="POST" style="display:inline;">
-                        <input type="hidden" name="old_employee_name" value="{{ skill[0] }}">
-                        <input type="hidden" name="old_skill" value="{{ skill[1] }}">
-                        <input type="hidden" name="old_skill_level" value="{{ skill[2] }}">
-                        <input type="text" name="employee_name" placeholder="New Name" required>
-                        <input type="text" name="skill" placeholder="New Skill" required>
-                        <input type="text" name="skill_level" placeholder="New Level" required>
-                        <button type="submit">Edit</button>
-                    </form>
-                    <form action="/delete_skill" method="POST" style="display:inline;">
-                        <input type="hidden" name="employee_name" value="{{ skill[0] }}">
-                        <input type="hidden" name="skill" value="{{ skill[1] }}">
-                        <button type="submit">Delete</button>
-                    </form>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <!-- Section for Adding/Removing Skills -->
+    <h2>Manage Skills</h2>
+    <form action="/add_skill" method="POST">
+        <label for="student_id">Student ID:</label>
+        <input type="text" id="student_id" name="student_id" required>
+
+        <label for="skill_name">Skill Name:</label>
+        <input type="text" id="skill_name" name="skill_name" required>
+
+        <label for="skill_url">Skill URL:</label>
+        <input type="url" id="skill_url" name="skill_url" required>
+
+        <button type="submit">Add Skill</button>
+    </form>
+    
+    <form action="/remove_skill" method="POST">
+        <label for="student_id">Student ID:</label>
+        <input type="text" id="student_id" name="student_id" required>
+        
+        <label for="skill_name">Skill Name:</label>
+        <input type="text" id="skill_name" name="skill_name" required>
+
+        <button type="submit">Remove Skill</button>
+    </form>
 </body>
 </html>

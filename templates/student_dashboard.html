@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <h1>Student Dashboard</h1>
+    
+    <h2>Your Skills</h2>
+    <ul>
+        {% for skill in skills %}
+        <li>
+            <strong>{{ skill.name }}</strong> (Score: {{ skill.score }}) 
+            - <a href="{{ skill.url }}" target="_blank">Learn more</a>
+        </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
