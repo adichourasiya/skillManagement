@@ -1,112 +1,83 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, session
 import sqlite3
 
 app = Flask(__name__)
+app.secret_key = 'your_secret_key'
 
-# Initialize the database (SQLite) if it doesn't exist
-def init_db():
+def get_db_connection():
     conn = sqlite3.connect('data.db')
-    c = conn.cursor()
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS students (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL
-        )
-    ''')
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS skills (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            student_id INTEGER NOT NULL,
-            name TEXT NOT NULL,
-            score INTEGER DEFAULT 0,
-            url TEXT NOT NULL,
-            FOREIGN KEY (student_id) REFERENCES students(id)
-        )
-    ''')
-    conn.commit()
-    conn.close()
+    conn.row_factory = sqlite3.Row
+    return conn
 
-# Home route (admin view by default)
 @app.route('/')
+def home():
+    return render_template('login.html')
+
+@app.route('/login', methods=['POST'])
+def login():
+    username, password = request.form['username'], request.form['password']
+    with get_db_connection() as conn:
+        user = conn.execute('SELECT * FROM users WHERE username=? AND password=?', (username, password)).fetchone()
+
+    if user:
+        session.update(username=username, role=user['role'])
+        return redirect(url_for('dashboard'))
+    return "Invalid username or password"
+
+@app.route('/dashboard')
+def dashboard():
+    if 'role' not in session:
+        return redirect(url_for('home'))
+    return redirect(url_for('admin_dashboard')) if session['role'] == 'admin' else redirect(url_for('student_dashboard', student_id=session['student_id']))
+
+@app.route('/admin_dashboard')
 def admin_dashboard():
-    conn = sqlite3.connect('data.db')
-    c = conn.cursor()
-
-    # Fetch all students for the admin dashboard
-    c.execute('SELECT * FROM students')
-    students = c.fetchall()
-
-    conn.close()
+    with get_db_connection() as conn:
+        students = conn.execute('SELECT * FROM students').fetchall()
     return render_template('admin_dashboard.html', students=students)
 
-# Route for adding a student
 @app.route('/add_student', methods=['POST'])
 def add_student():
     name = request.form['student_name']
-    
-    conn = sqlite3.connect('data.db')
-    c = conn.cursor()
-    c.execute('INSERT INTO students (name) VALUES (?)', (name,))
-    conn.commit()
-    conn.close()
-    
+    with get_db_connection() as conn:
+        conn.execute('INSERT INTO students (name) VALUES (?)', (name,))
+        conn.commit()
     return redirect(url_for('admin_dashboard'))
 
-# Route for removing a student
 @app.route('/remove_student', methods=['POST'])
 def remove_student():
     student_id = request.form['student_id']
-    
-    conn = sqlite3.connect('data.db')
-    c = conn.cursor()
-    c.execute('DELETE FROM students WHERE id=?', (student_id,))
-    conn.commit()
-    conn.close()
-    
+    with get_db_connection() as conn:
+        conn.execute('DELETE FROM students WHERE id=?', (student_id,))
+        conn.commit()
     return redirect(url_for('admin_dashboard'))
 
-# Route for adding a skill to a student
 @app.route('/add_skill', methods=['POST'])
 def add_skill():
-    student_id = request.form['student_id']
-    skill_name = request.form['skill_name']
-    skill_url = request.form['skill_url']
-    
-    conn = sqlite3.connect('data.db')
-    c = conn.cursor()
-    c.execute('INSERT INTO skills (student_id, name, url) VALUES (?, ?, ?)', (student_id, skill_name, skill_url))
-    conn.commit()
-    conn.close()
-    
+    student_id, skill_name, skill_url = request.form['student_id'], request.form['skill_name'], request.form['skill_url']
+    with get_db_connection() as conn:
+        conn.execute('INSERT INTO skills (student_id, name, url) VALUES (?, ?, ?)', (student_id, skill_name, skill_url))
+        conn.commit()
     return redirect(url_for('admin_dashboard'))
 
-# Route for removing a skill from a student
 @app.route('/remove_skill', methods=['POST'])
 def remove_skill():
-    student_id = request.form['student_id']
-    skill_name = request.form['skill_name']
-    
-    conn = sqlite3.connect('data.db')
-    c = conn.cursor()
-    c.execute('DELETE FROM skills WHERE student_id=? AND name=?', (student_id, skill_name))
-    conn.commit()
-    conn.close()
-    
+    student_id, skill_name = request.form['student_id'], request.form['skill_name']
+    with get_db_connection() as conn:
+        conn.execute('DELETE FROM skills WHERE student_id=? AND name=?', (student_id, skill_name))
+        conn.commit()
     return redirect(url_for('admin_dashboard'))
 
-# Route for the student dashboard (students see their skills)
 @app.route('/student/<int:student_id>')
 def student_dashboard(student_id):
-    conn = sqlite3.connect('data.db')
-    c = conn.cursor()
-
-    # Fetch student's skills
-    c.execute('SELECT name, score, url FROM skills WHERE student_id=?', (student_id,))
-    skills = c.fetchall()
-
-    conn.close()
+    with get_db_connection() as conn:
+        skills = conn.execute('SELECT name, score, url FROM skills WHERE student_id=?', (student_id,)).fetchall()
     return render_template('student_dashboard.html', skills=skills)
 
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('home'))
+
 if __name__ == '__main__':
-    init_db()  # Initialize the database when starting the app
     app.run(debug=True)

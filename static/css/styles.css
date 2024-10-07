@@ -1,0 +1,73 @@
+/* General styles for body */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4; /* Light background for better contrast */
+    color: #333; /* Dark text color for readability */
+    box-sizing: border-box;
+}
+
+/* Container for the main content */
+.container {
+    width: 100%;
+    max-width: 1200px; /* Limit the width on larger screens */
+    margin: 0 auto; /* Center align the container */
+    padding: 20px; /* Add padding around the content */
+}
+
+/* Header styles */
+header {
+    background-color: #007bff; /* Bootstrap primary color */
+    color: white; /* White text for header */
+    padding: 10px 0; /* Padding for header */
+    text-align: center; /* Center align text */
+}
+
+/* Main section styles */
+main {
+    background: white; /* White background for main section */
+    border-radius: 5px; /* Rounded corners */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    padding: 20px; /* Inner padding */
+}
+
+/* Form styles */
+form {
+    display: flex; /* Use flexbox for layout */
+    flex-direction: column; /* Stack form elements */
+    gap: 15px; /* Space between form elements */
+}
+
+/* Input field styles */
+input[type="text"], 
+input[type="password"],
+input[type="url"] {
+    padding: 10px; /* Inner padding */
+    border: 1px solid #ccc; /* Light gray border */
+    border-radius: 5px; /* Rounded corners */
+    width: 100%; /* Full width */
+}
+
+/* Button styles */
+button {
+    padding: 10px; /* Inner padding */
+    border: none; /* Remove border */
+    border-radius: 5px; /* Rounded corners */
+    background-color: #007bff; /* Bootstrap primary color */
+    color: white; /* White text */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: background-color 0.3s; /* Smooth transition */
+}
+
+/* Button hover effect */
+button:hover {
+    background-color: #0056b3; /* Darker shade on hover */
+}
+
+/* Responsive styles for smaller screens */
+@media (max-width: 768px) {
+    .container {
+        padding: 10px; /* Less padding on small screens */
+    }
+}
