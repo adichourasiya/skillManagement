@@ -5,10 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+
 </head>
 <body>
     <h1>Admin Dashboard</h1>
-    
+
     <!-- Section for Adding/Removing Students -->
     <h2>Manage Students</h2>
     <form action="/add_student" method="POST">
@@ -47,5 +48,30 @@
 
         <button type="submit">Remove Skill</button>
     </form>
+
+    <!-- Table to Display Students and Their Skills -->
+    <h2>Existing Students and Skills</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Student ID</th>
+                <th>Student Name</th>
+                <th>Skill Name</th>
+                <th>Skill Score</th>
+                <th>Skill URL</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for student in students %}
+            <tr>
+                <td>{{ student[0] }}</td>
+                <td>{{ student[1] }}</td>
+                <td>{{ student[2] }}</td>
+                <td>{{ student[3] }}</td>
+                <td><a href="{{ student[4] }}" target="_blank">View Skill Material</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </body>
 </html>
