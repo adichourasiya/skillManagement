@@ -3,9 +3,9 @@ Library           SeleniumLibrary
 
 *** Variables ***
 ${BASE_URL}      http://127.0.0.1:5000
-${ADMIN_USER}    admin_username
+${ADMIN_USER}    admin
 ${ADMIN_PASS}    admin_password
-${STUDENT_USER}  student_username
+${STUDENT_USER}  student
 ${STUDENT_PASS}   student_password
 
 *** Test Cases ***
