@@ -4,74 +4,205 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f9f9f9;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .form-section, .table-section {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        input[type="text"], input[type="url"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+        }
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 220px;
+            background-color: #333;
+            color: #fff;
+            text-align: left;
+            padding: 10px;
+            border-radius: 4px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%; /* Position tooltip above the element */
+            left: 50%;
+            margin-left: -110px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 13px;
+        }
+        .tooltip .tooltiptext::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #333 transparent transparent transparent;
+        }
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h1>Admin Dashboard</h1>
+    <header>
+        <h1>Admin Dashboard</h1>
+    </header>
 
-    <!-- Section for Adding/Removing Students -->
-    <h2>Manage Students</h2>
-    <form action="/add_student" method="POST">
-        <label for="student_name">Student Name:</label>
-        <input type="text" id="student_name" name="student_name" required>
-        <button type="submit">Add Student</button>
-    </form>
-    
-    <form action="/remove_student" method="POST">
-        <label for="student_id">Student ID:</label>
-        <input type="text" id="student_id" name="student_id" required>
-        <button type="submit">Remove Student</button>
-    </form>
+    <main class="container">
+        <!-- Section for Adding/Removing Students -->
+        <div class="form-section">
+            <h2>
+                <span class="tooltip">Manage Students
+                    <span class="tooltiptext">To add a student, enter the name and click 'Add Student'. To remove a student, enter their ID and click 'Remove Student'.</span>
+                </span>
+            </h2>
+            <form action="/add_student" method="POST">
+                <label for="student_name">Student Name:</label>
+                <input type="text" id="student_name" name="student_name" required placeholder="Enter student name">
+                <button type="submit">Add Student</button>
+            </form>
 
-    <!-- Section for Adding/Removing Skills -->
-    <h2>Manage Skills</h2>
-    <form action="/add_skill" method="POST">
-        <label for="student_id">Student ID:</label>
-        <input type="text" id="student_id" name="student_id" required>
+            <form action="/remove_student" method="POST">
+                <label for="student_id_remove">Student ID:</label>
+                <input type="text" id="student_id_remove" name="student_id" required placeholder="Enter student ID">
+                <button type="submit" style="background-color: #dc3545;">Remove Student</button>
+            </form>
+        </div>
 
-        <label for="skill_name">Skill Name:</label>
-        <input type="text" id="skill_name" name="skill_name" required>
+        <!-- Section for Adding/Removing Skills -->
+        <div class="form-section">
+            <h2>
+                <span class="tooltip">Manage Skills
+                    <span class="tooltiptext">To add a skill, enter the student ID, skill name, and URL, then click 'Add Skill'. To remove a skill, enter the student ID and the skill name to delete.</span>
+                </span>
+            </h2>
+            <form action="/add_skill" method="POST">
+                <label for="student_id_add">Student ID:</label>
+                <input type="text" id="student_id_add" name="student_id" required placeholder="Enter student ID">
 
-        <label for="skill_url">Skill URL:</label>
-        <input type="url" id="skill_url" name="skill_url" required>
+                <label for="skill_name">Skill Name:</label>
+                <input type="text" id="skill_name" name="skill_name" required placeholder="Enter skill name">
 
-        <button type="submit">Add Skill</button>
-    </form>
-    
-    <form action="/remove_skill" method="POST">
-        <label for="student_id">Student ID:</label>
-        <input type="text" id="student_id" name="student_id" required>
-        
-        <label for="skill_name">Skill Name:</label>
-        <input type="text" id="skill_name" name="skill_name" required>
+                <label for="skill_url">Skill URL:</label>
+                <input type="url" id="skill_url" name="skill_url" required placeholder="Enter skill URL">
+                
+                <button type="submit">Add Skill</button>
+            </form>
 
-        <button type="submit">Remove Skill</button>
-    </form>
+            <form action="/remove_skill" method="POST">
+                <label for="student_id_remove_skill">Student ID:</label>
+                <input type="text" id="student_id_remove_skill" name="student_id" required placeholder="Enter student ID">
 
-    <!-- Table to Display Students and Their Skills -->
-    <h2>Existing Students and Skills</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Student ID</th>
-                <th>Student Name</th>
-                <th>Skill Name</th>
-                <th>Skill Score</th>
-                <th>Skill URL</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for student in students %}
-            <tr>
-                <td>{{ student[0] }}</td>
-                <td>{{ student[1] }}</td>
-                <td>{{ student[2] }}</td>
-                <td>{{ student[3] }}</td>
-                <td><a href="{{ student[4] }}" target="_blank">View Skill Material</a></td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+                <label for="skill_name_remove">Skill Name:</label>
+                <input type="text" id="skill_name_remove" name="skill_name" required placeholder="Enter skill name">
+                
+                <button type="submit" style="background-color: #dc3545;">Remove Skill</button>
+            </form>
+        </div>
+
+        <!-- Table to Display Students and Their Skills -->
+        <div class="table-section">
+            <h2>
+                <span class="tooltip">Existing Students and Skills
+                    <span class="tooltiptext">This table shows the students with their corresponding skills and scores. Click on the 'View Skill Material' link to access study resources.</span>
+                </span>
+            </h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Student ID</th>
+                        <th>Student Name</th>
+                        <th>Skill Name</th>
+                        <th>Skill Score</th>
+                        <th>Skill URL</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in students %}
+                    <tr>
+                        <td>{{ student[0] }}</td>
+                        <td>{{ student[1] }}</td>
+                        <td>{{ student[2] }}</td>
+                        <td>{{ student[3] }}</td>
+                        <td><a href="{{ student[4] }}" target="_blank">View Skill Material</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </main>
 </body>
 </html>
